@@ -1,3 +1,0 @@
-/home/lsg/Desktop/REMEZ_REBOOT/build/CMakeFiles/a.out.dir
-/home/lsg/Desktop/REMEZ_REBOOT/build/CMakeFiles/edit_cache.dir
-/home/lsg/Desktop/REMEZ_REBOOT/build/CMakeFiles/rebuild_cache.dir

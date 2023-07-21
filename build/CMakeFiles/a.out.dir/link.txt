@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/a.out.dir/main.cpp.o CMakeFiles/a.out.dir/Point.cpp.o CMakeFiles/a.out.dir/func.cpp.o CMakeFiles/a.out.dir/Polynomial.cpp.o CMakeFiles/a.out.dir/RemezGeneral.cpp.o -o a.out  -lntl -lgmp -lm 
