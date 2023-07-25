@@ -26,6 +26,7 @@ public:
 //    long boundary_K;
     long section_num;
     double* sections;
+    double chebeval_k;
     long deg;
 
     RemezGeneral(RemezParam _params, long _section_num, double* _sections, long _deg);

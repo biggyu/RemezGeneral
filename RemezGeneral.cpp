@@ -11,10 +11,18 @@ RemezGeneral::RemezGeneral(RemezParam _params, long _section_num, double *_secti
 
     width = new RR[section_num];
     sc = new RR[section_num];
+
+    //chebeval gives accurate result when boundary is [-1, 1].
+    //as the boundary is different due to generalization, chebeval_k is defined to change the original range to the above.
+    chebeval_k = 0;
     for (long i = 0; i < section_num; i++) {
         width[i] = abs(RR(sections[2 * i + 1] - sections[2 * i]));
         sc[i] = width[i] / pow(2.0, params.log_scan_step_diff);
+        chebeval_k = abs(sections[2 * i]) > chebeval_k ? abs(sections[2 * i]) : chebeval_k;
+        chebeval_k = abs(sections[2 * i + 1]) > chebeval_k ? abs(sections[2 * i + 1]) : chebeval_k;
     }
+    chebeval_k = ceil(chebeval_k);
+    cout << "chebeval_k: " << chebeval_k << endl;
 
     // for(int i = 0; i < section_num; i++) {
     //     cout << width[i] << " ";
@@ -239,8 +247,7 @@ void RemezGeneral::getcoeffwitherr() {
     for(long i = 0; i < deg + 2; i++) {
         var = v[i];
         m[i][0] = 1;
-        //        m[i][1] = var / boundary_K;
-        m[i][1] = var / section_num;
+        m[i][1] = var / chebeval_k;
         for (long j = 2; j < deg + 1; j++) {
             m[i][j] = 2 * m[i][1] * m[i][j - 1] - m[i][j - 2];
         }
@@ -267,23 +274,10 @@ void RemezGeneral::getextreme_local(Point *local_extreme_point, long &local_extr
 	long tmpinc;
 	RR scan_1, scan_2;
 	
-    // scan_2 = k - width;
-	scan_2 = sections[2 * section_ind]; //starting point??
-	// cout << scan_2 << endl;
+	scan_2 = sections[2 * section_ind];
+	
 
-    //chebeval gives accurate result when boundary is [-1, 1].
-    //as the boundary is different due to generalization, chebeval_k is defined to change the original range to the above.
-
-    double chebeval_k = abs(sections[0]);
-    for(long i = 1; i < 2 * section_num; i++) {
-        chebeval_k = abs(sections[i]) > chebeval_k ? abs(sections[i]) : chebeval_k;
-    }
-    // cout << ceil(chebeval_k) << " " << typeid(ceil(chebeval_k)).name() << endl;
-    chebeval_k = ceil(chebeval_k);
-    cout << chebeval_k << endl;
-
-    // double chebeval_k = abs(sections[0]) > abs(sections[2 * section_num - 1]) ? abs(sections[2 * section_num - 1]) : abs(sections[0]);
-	RR scan_y1, scan_y2 = chebeval(deg, coeff, scan_2 / chebeval_k) - function_value(scan_2); ///////
+	RR scan_y1, scan_y2 = chebeval(deg, coeff, scan_2 / chebeval_k) - function_value(scan_2);
 	local_extreme_count = 0;
 	
 	RR detail[3];
@@ -301,16 +295,19 @@ void RemezGeneral::getextreme_local(Point *local_extreme_point, long &local_extr
         inc_1 = inc_2;
 		scan_y1 = scan_y2;
 		scan_y2 = chebeval(deg, coeff, scan_2 / chebeval_k) - function_value(scan_2);
-		if(scan_y1 < scan_y2) {
-            inc_2 = 1;
-        } else if(scan_y1 > scan_y2) {
-            inc_2 = -1;
-        } else {
-            inc_2 = 0;
-        }
+        
+		// if(scan_y1 < scan_y2) {
+        //     inc_2 = 1;
+        // } else if(scan_y1 > scan_y2) {
+        //     inc_2 = -1;
+        // } else {
+        //     inc_2 = 0;
+        // }
+        inc_2 = (scan_y1 < scan_y2) ? 1 : ((scan_y1 > scan_y2) ? -1 : 0);
+
 		// cout << "inc : " << inc_2 << endl;
 		// if((inc_1 == 1 && inc_2 != 1) || (inc_1 == -1 && inc_2 != -1) || inc_1 == 0) {
-        if(inc_1 * inc_2 != 1 || inc_1 == 0) {
+        if(inc_1 * inc_2 != 1) {
 			prec_end = false;
 			tmp_inc = inc_2;
 			prec_x = scan_2;
@@ -366,6 +363,7 @@ void RemezGeneral::getextreme_local(Point *local_extreme_point, long &local_extr
                 //     tmpinc = 1;
                 // }
                 tmpinc = (inc_2 == 1) ? -1 : 1;
+                
 				// cout << "###" << inc_2 << " " << prec_ext << " " << tmpinc * prec_ext << endl;
 				if(tmpinc * prec_ext >= current_err) {
 					local_extreme_point[local_extreme_count].x = prec_x;
@@ -381,7 +379,7 @@ void RemezGeneral::getextreme_local(Point *local_extreme_point, long &local_extr
 					// local_extreme_count++;
 					// cout << "prec_end : " << prec_end << endl;
 
-                    // cout << "[" << section_ind << "]: " << local_extreme_count << endl;
+                    cout << "[" << section_ind << "]: " << local_extreme_count << endl;
 				}
 				// if(!prec_end) { 
 				// 	inc_2 = (-1) * inc_2; 
@@ -580,7 +578,7 @@ void RemezGeneral::getextreme() {
         t.join();
     }
 
-    cout << "getextreme_local has ended" << endl;
+    // cout << "getextreme_local has ended" << endl;
 
     extreme_count = 0;
     for (long i = 0; i < section_num; i++) {
@@ -763,7 +761,7 @@ void RemezGeneral::generate_optimal_poly(Polynomial &poly) {
     // while ((max_err - min_err) / min_err > approx) {
     //     getcoeffwitherr();
     //     getextreme();
-    //     choosemaxs(); //////////////////////////////////////error//////////////////////////////////////
+    //     choosemaxs();
     //     it++;
     //     // for(long i = 0; i < deg + 2; i++) {
     //     //         cout << sample_point[i].x << endl;
