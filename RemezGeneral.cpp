@@ -24,16 +24,6 @@ RemezGeneral::RemezGeneral(RemezParam _params, long _section_num, double *_secti
     chebeval_k = ceil(chebeval_k);
     cout << "chebeval_k: " << chebeval_k << endl;
 
-    // for(int i = 0; i < section_num; i++) {
-    //     cout << width[i] << " ";
-    // }
-    // cout << endl;
-
-    // for(int i = 0; i < section_num; i++) {
-    //     cout << sc[i] << " ";
-    // }
-    // cout << endl;
-
     approx = power2_RR(-params.log_approx_degree);
 
     max_err = 1000;
@@ -45,141 +35,141 @@ RemezGeneral::RemezGeneral(RemezParam _params, long _section_num, double *_secti
     coeff = new RR[deg + 1];
 }
 
-void RemezGeneral::better_initialize() {
-    int nodecount[section_num];
-    int deg_bdd = deg + 2;
+// void RemezGeneral::better_initialize() {
+//     int nodecount[section_num];
+//     int deg_bdd = deg + 2;
 
-    for (long i = 0; i < section_num; i++) {
-        nodecount[i] = 1;
-    }
-    int tot_deg = section_num;
+//     for (long i = 0; i < section_num; i++) {
+//         nodecount[i] = 1;
+//     }
+//     int tot_deg = section_num;
 
-    double *err = new double[section_num];
-    for (long i = 0; i < section_num; i++) {
-        err[i] = sections[2 * i + 1] - sections[2 * i];
-    }
+//     double *err = new double[section_num];
+//     for (long i = 0; i < section_num; i++) {
+//         err[i] = sections[2 * i + 1] - sections[2 * i];
+//     }
 
-    RR::SetPrecision(params.RR_prec);
+//     RR::SetPrecision(params.RR_prec);
 
-    double bdd[section_num];
+//     double bdd[section_num];
 
-    for (long i = 0; i < section_num; i++) {
-        double temp = 0;
-        for (long j = 1; j <= section_num; j++) {
-            temp -= log2((double)j);
-        }
+//     for (long i = 0; i < section_num; i++) {
+//         double temp = 0;
+//         for (long j = 1; j <= section_num; j++) {
+//             temp -= log2((double)j);
+//         }
 
-        temp += section_num * log2(2 * M_PI);
-        temp += log2(err[i]);
+//         temp += section_num * log2(2 * M_PI);
+//         temp += log2(err[i]);
 
-        bdd[i] = temp;
-        for (int j = 1; j <= section_num - 1 - i; j++) {
-            bdd[i] += log2((double)j + err[i]);
-        }
-        for (int j = 1; j <= section_num - 1 + i; j++) {
-            bdd[i] += log2((double)j + err[i]);
-        }
-    }
+//         bdd[i] = temp;
+//         for (int j = 1; j <= section_num - 1 - i; j++) {
+//             bdd[i] += log2((double)j + err[i]);
+//         }
+//         for (int j = 1; j <= section_num - 1 + i; j++) {
+//             bdd[i] += log2((double)j + err[i]);
+//         }
+//     }
 
-    int max_iter = 200;
-    // int iter;
+//     int max_iter = 200;
+//     // int iter;
 
-    for (int iter = 0; iter < max_iter; iter++) {
-        if (tot_deg >= deg_bdd) {
-            break;
-        }
-        int maxi = max_index(bdd, section_num);
+//     for (int iter = 0; iter < max_iter; iter++) {
+//         if (tot_deg >= deg_bdd) {
+//             break;
+//         }
+//         int maxi = max_index(bdd, section_num);
 
-        if(maxi != 0) {
-			if((tot_deg+2) > deg_bdd) {
-				break;
-            }
+//         if(maxi != 0) {
+// 			if((tot_deg+2) > deg_bdd) {
+// 				break;
+//             }
 	
-			for(int i = 0; i < section_num; i++) {
-				bdd[i] -= log2(tot_deg + 1);
-				bdd[i] -= log2(tot_deg + 2);
-				bdd[i] += 2.0 * log2(2.0 * M_PI);
+// 			for(int i = 0; i < section_num; i++) {
+// 				bdd[i] -= log2(tot_deg + 1);
+// 				bdd[i] -= log2(tot_deg + 2);
+// 				bdd[i] += 2.0 * log2(2.0 * M_PI);
 
-                bdd[i] += (i != maxi) ? (log2(abs((double)(i - maxi)) + err[i] * ((double)(i + maxi) + err[i]))) : 
-                (log2(err[i] * 2.0 * (double)i + err[i]) - 1.0);
-				// if(i != maxi) {	
-				// 	bdd[i] += log2(abs((double)(i - maxi)) + err[i]);
-				// 	bdd[i] += log2((double)(i + maxi) + err[i]);
-				// } else { 
-				// 	bdd[i] += (log2(err[i]) - 1.0);
-				// 	bdd[i] += log2(2.0 * (double)i + err[i]);
-				// }
-			}
+//                 bdd[i] += (i != maxi) ? (log2(abs((double)(i - maxi)) + err[i] * ((double)(i + maxi) + err[i]))) : 
+//                 (log2(err[i] * 2.0 * (double)i + err[i]) - 1.0);
+// 				// if(i != maxi) {	
+// 				// 	bdd[i] += log2(abs((double)(i - maxi)) + err[i]);
+// 				// 	bdd[i] += log2((double)(i + maxi) + err[i]);
+// 				// } else { 
+// 				// 	bdd[i] += (log2(err[i]) - 1.0);
+// 				// 	bdd[i] += log2(2.0 * (double)i + err[i]);
+// 				// }
+// 			}
 			
-			tot_deg += 2;
-		} else { 
-			bdd[0] -= log2(tot_deg + 1);
-			bdd[0] += (log2(err[0]) - 1.0);
-			bdd[0] += log2(2.0 * M_PI);
-			for(int i = 1; i < section_num; i++) {	
-				bdd[i] -= log2(tot_deg + 1);
-				bdd[i] += log2(2.0 * M_PI);
-				bdd[i] += log2((double)i + err[i]);	
-			}
+// 			tot_deg += 2;
+// 		} else { 
+// 			bdd[0] -= log2(tot_deg + 1);
+// 			bdd[0] += (log2(err[0]) - 1.0);
+// 			bdd[0] += log2(2.0 * M_PI);
+// 			for(int i = 1; i < section_num; i++) {	
+// 				bdd[i] -= log2(tot_deg + 1);
+// 				bdd[i] += log2(2.0 * M_PI);
+// 				bdd[i] += log2((double)i + err[i]);	
+// 			}
 		
-			tot_deg += 1;	
-		}
+// 			tot_deg += 1;	
+// 		}
 		
-		nodecount[maxi] += 1;
-    }
-    // delete[] bdd;
+// 		nodecount[maxi] += 1;
+//     }
+//     // delete[] bdd;
 
-    // cout << "node count" << endl;
-    // for(int i = 0; i < (section_num + 1) / 2; i++) {
-    //     cout << nodecount[i] << " ";
-    // }
-    // cout << endl;
+//     // cout << "node count" << endl;
+//     // for(int i = 0; i < (section_num + 1) / 2; i++) {
+//     //     cout << nodecount[i] << " ";
+//     // }
+//     // cout << endl;
 
-    // cout << "sample pnt" << endl;
-    // for(int i = 0; i < deg + 2; i++) {
-    //     cout << sample_point[i].x << " " << sample_point[i].y << endl;
-    // }
-    // cout << endl;
+//     // cout << "sample pnt" << endl;
+//     // for(int i = 0; i < deg + 2; i++) {
+//     //     cout << sample_point[i].x << " " << sample_point[i].y << endl;
+//     // }
+//     // cout << endl;
 
-    if (tot_deg == deg_bdd - 1) {
-        nodecount[0]++;
-        tot_deg++;
-    }
+//     if (tot_deg == deg_bdd - 1) {
+//         nodecount[0]++;
+//         tot_deg++;
+//     }
 
-    RR inter_size[section_num];
-    for (long i = 0; i < section_num; i++) {
-        inter_size[i] = width[i];
-    }
+//     RR inter_size[section_num];
+//     for (long i = 0; i < section_num; i++) {
+//         inter_size[i] = width[i];
+//     }
 
-    int cnt = 0;
-    if ((nodecount[0] % 2) != 0) {
-        sample_point[cnt++].x = RR(0);
-    }
+//     int cnt = 0;
+//     if ((nodecount[0] % 2) != 0) {
+//         sample_point[cnt++].x = RR(0);
+//     }
 
-    for(int i = 0; i < section_num; i++) {
-		for(int j = 1; j <= nodecount[i]; j++) {
-			RR temp = ((RR(2 * j - 1)) * ComputePi_RR()) / (RR(2 * nodecount[i]));		
-			sample_point[cnt++].x = RR(sections[2 * i]) + inter_size[i] * cos(temp);
-			// sample_point[cnt++].x = RR(-i) - inter_size[i] * cos(temp);
-		}
-	}
+//     for(int i = 0; i < section_num; i++) {
+// 		for(int j = 1; j <= nodecount[i]; j++) {
+// 			RR temp = ((RR(2 * j - 1)) * ComputePi_RR()) / (RR(2 * nodecount[i]));		
+// 			sample_point[cnt++].x = RR(sections[2 * i]) + inter_size[i] * cos(temp);
+// 			// sample_point[cnt++].x = RR(-i) - inter_size[i] * cos(temp);
+// 		}
+// 	}
 
-    // for (int j = 1; j <= (nodecount[0] / 2); j++) {
-    //     RR temp = ((RR(2 * j - 1)) * ComputePi_RR()) / (RR(2 * nodecount[0]));
-    //     sample_point[cnt++].x = inter_size[i] * cos(temp);
-    //     sample_point[cnt++].x = -inter_size[i] * cos(temp);
-    //     // i = (i >= section_num) ? 0 : i + 1;
-    // }
+//     // for (int j = 1; j <= (nodecount[0] / 2); j++) {
+//     //     RR temp = ((RR(2 * j - 1)) * ComputePi_RR()) / (RR(2 * nodecount[0]));
+//     //     sample_point[cnt++].x = inter_size[i] * cos(temp);
+//     //     sample_point[cnt++].x = -inter_size[i] * cos(temp);
+//     //     // i = (i >= section_num) ? 0 : i + 1;
+//     // }
 
-    sort(sample_point, sample_point + (deg + 2), xcompare);
+//     sort(sample_point, sample_point + (deg + 2), xcompare);
 
-    for (int i = 0; i < deg + 2; i++) {
-        sample_point[i].y = function_value(sample_point[i].x);
-        std::cout << sample_point[i].x  << std::endl;
-    }
+//     for (int i = 0; i < deg + 2; i++) {
+//         sample_point[i].y = function_value(sample_point[i].x);
+//         std::cout << sample_point[i].x  << std::endl;
+//     }
 
-    // delete[] nodecount;
-}
+//     // delete[] nodecount;
+// }
 
 void RemezGeneral::initialize() {
 	RR::SetPrecision(params.RR_prec);
@@ -249,9 +239,9 @@ void RemezGeneral::getcoeffwitherr() {
         m[i][0] = 1;
         m[i][1] = var / chebeval_k;
         for (long j = 2; j < deg + 1; j++) {
-            m[i][j] = 2 * m[i][1] * m[i][j - 1] - m[i][j - 2];
+            m[i][j] = 2 * (var / chebeval_k) * m[i][j - 1] - m[i][j - 2];
         }
-        m[i][deg + 1] = 2 * (i % 2) - 1;
+        m[i][deg + 1] = 2 * (i % 2) - 1; //1 when odd 0 when even
     }
     RR deter;
     mat_RR mtrns;
@@ -289,106 +279,177 @@ void RemezGeneral::getextreme_local(Point *local_extreme_point, long &local_extr
 	while(scan_2 < sections[2 * section_ind + 1] + sc[section_ind]) {
 		scan_1 = scan_2;
 		scan_2 = scan_1 + sc[section_ind]; //move forward sc(epsilon)
-		// std::cout << scan_2 << std::endl;
 
+        // if(fracpart(scan_2) > width[section_ind] + sc[section_ind] / 2) {
+        if(scan_2 > sections[2 * section_ind + 1] + sc[section_ind] / 2) {
+			// cout << "boundary detected" << endl;
+			// cout << "inc : " << inc_2 << endl;
+			scan_1 = sections[2 * section_ind + 1];
+			scan_2 = sections[2 * section_ind + 1] + sc[section_ind];
+			// scan_2 = sections[2 * section_ind + 1] + 1 - width[section_ind];
 
-        inc_1 = inc_2;
-		scan_y1 = scan_y2;
-		scan_y2 = chebeval(deg, coeff, scan_2 / chebeval_k) - function_value(scan_2);
-        
-		// if(scan_y1 < scan_y2) {
-        //     inc_2 = 1;
-        // } else if(scan_y1 > scan_y2) {
-        //     inc_2 = -1;
-        // } else {
-        //     inc_2 = 0;
-        // }
-        inc_2 = (scan_y1 < scan_y2) ? 1 : ((scan_y1 > scan_y2) ? -1 : 0);
+			scan_y1 = chebeval(deg, coeff, scan_1 / chebeval_k) - function_value(scan_1);
+			scan_y2 = chebeval(deg, coeff, scan_2 / chebeval_k) - function_value(scan_2);
 
-		// cout << "inc : " << inc_2 << endl;
-		// if((inc_1 == 1 && inc_2 != 1) || (inc_1 == -1 && inc_2 != -1) || inc_1 == 0) {
-        if(inc_1 * inc_2 != 1) {
 			prec_end = false;
-			tmp_inc = inc_2;
-			prec_x = scan_2;
+			prec_x = scan_1 - sc[section_ind];
 			while(!prec_end) {
-				prec_sc = (prec_x - scan_1) / 2;
+				prec_sc = (scan_1 - prec_x) / 2;
 				prec_end = true;
-				if(inc_1 != 0) {
-					// cout << "extreme detected" << endl;
-					for(long k = 0; k < 3; k++) {
-						detail[k] = scan_1 + (k - 1) * prec_sc;
-					}
-				} else {
-					// cout << "boundary start" << endl;
-					for(long k = 0; k < 3; k++) {
-						detail[k] = scan_1 + prec_sc * k;
-					}
+				for(long k = 0; k < 3; k++) {
+					detail[k] = scan_1 + (k - 2) * prec_sc;
 				}
 				prec_iter = 0;
-				while(prec_iter < params.binary_prec) {
+				while(prec_iter < params.binary_prec) { // < 10
 					prec_ext = chebeval(deg, coeff, detail[0] / chebeval_k) - function_value(detail[0]);
 					prec_ind = 0;
 					for(long k = 1; k < 3; k++) {
 						tmp = chebeval(deg, coeff, detail[k] / chebeval_k) - function_value(detail[k]);
-						if((inc_1 == 1 && prec_ext < tmp) || (inc_1 == -1 && prec_ext > tmp)) {
+						if((inc_2 == 1 && prec_ext < tmp) || (inc_2 == -1 && prec_ext > tmp)) {
 							prec_ext = tmp;
 							prec_ind = k;
-						} else if(inc_1 == 0) {
-							if((inc_2 == 1 && prec_ext > tmp) || (inc_2 == -1 && prec_ext < tmp)) {
-								prec_ext = tmp;
-								prec_ind = k;
-							}
 						}
 					}
-					if(inc_1 == 0 && prec_ind != 0) {
+					if(prec_ind != 2) {
                         prec_end = false;
                     }
+                    // prec_end = prec_ind == 2;
+
 					prec_x = detail[prec_ind];
-					prec_sc = prec_sc / 2;
-					// cout << "prec_ind : " << prec_ind << " prec_x : " << prec_x << endl;
+					prec_sc /= 2;
 					for(long k = 0; k < 3; k++) {
-						// if(inc_1 == 0) {
-                        //     detail[k] = max(prec_x - prec_sc, scan_1) + prec_sc * k;
-                        // } else {
-                        //     detail[k] = prec_x - prec_sc + prec_sc * k;
-                        // }
-                        detail[k] = (inc_1 == 0) ? max(prec_x - prec_sc, scan_1) + prec_sc * k : prec_x + (k - 1) * prec_sc;
+						detail[k] = min(prec_x + prec_sc, scan_1) + (k - 2) * prec_sc;
 					}
 					prec_iter++;
+					// cout << "prec_ind : " << prec_ind << " prec_x : " << prec_x << endl;
 				}
-				// if(inc_2 == 1) {
-                //     tmpinc = -1;
-                // } else {
-                //     tmpinc = 1;
-                // }
-                tmpinc = (inc_2 == 1) ? -1 : 1;
-                
+				if(inc_2 == 1) {
+                    tmpinc = 1;
+                } else {
+                    tmpinc = -1;
+                }
+                // tmpinc = (inc_2 == 1) ? 1 : -1;
+
 				// cout << "###" << inc_2 << " " << prec_ext << " " << tmpinc * prec_ext << endl;
 				if(tmpinc * prec_ext >= current_err) {
 					local_extreme_point[local_extreme_count].x = prec_x;
 					local_extreme_point[local_extreme_count].y = prec_ext;
-					// if(inc_2 == 1) {
-                    //     local_extreme_point[local_extreme_count].locmm = -1;
-                    // } else {
-                    //     local_extreme_point[local_extreme_count].locmm = +1;
-                    // }
-                    local_extreme_point[local_extreme_count++].locmm = (inc_2 == 1) ? -1 : 1;
+					if(inc_2 == 1) {
+                        local_extreme_point[local_extreme_count].locmm = 1;
+                    } else {
+                        local_extreme_point[local_extreme_count].locmm = -1;
+                    }
+                    // local_extreme_point[local_extreme_count++].locmm = (inc_2 == 1) ? 1 : -1;
 
-					// cout << extreme_point[local_extreme_count].x << " " << extreme_point[local_extreme_count].y << " " << extreme_point[local_extreme_count].locmm << endl;
-					// local_extreme_count++;
+					// cout << extreme_point[extreme_count].x << " " << extreme_point[extreme_count].y << " " << extreme_point[extreme_count].locmm << endl;
+					local_extreme_count++;
 					// cout << "prec_end : " << prec_end << endl;
 
-                    cout << "[" << section_ind << "]: " << local_extreme_count << endl;
+                    // cout << "[" << section_ind << "]: " << local_extreme_count << endl;
 				}
-				// if(!prec_end) { 
-				// 	inc_2 = (-1) * inc_2; 
-				// 	// cout << "inc : " << inc_2 << endl;
-				// }
-                inc_2 *= prec_end ? 1 : -1;
+				if(!prec_end) {
+                    inc_2 = (-1) * inc_2;
+                }
+                // inc_2 *= prec_end ? 1 : -1;
 			}
-			inc_2 = tmp_inc;
-		}
+			inc_2 = 0;
+        } else {
+            inc_1 = inc_2;
+            scan_y1 = scan_y2;
+            scan_y2 = chebeval(deg, coeff, scan_2 / chebeval_k) - function_value(scan_2);
+            
+            if(scan_y1 < scan_y2) {
+                inc_2 = 1;
+            } else if(scan_y1 > scan_y2) {
+                inc_2 = -1;
+            } else {
+                inc_2 = 0;
+            }
+
+            // cout << "inc : " << inc_2 << endl;
+            // if((inc_1 == 1 && inc_2 != 1) || (inc_1 == -1 && inc_2 != -1) || inc_1 == 0) {
+            if(inc_1 * inc_2 != 1) {
+                prec_end = false;
+                tmp_inc = inc_2;
+                prec_x = scan_2;
+                while(!prec_end) {
+                    prec_sc = (prec_x - scan_1) / 2;
+                    prec_end = true;
+                    if(inc_1 != 0) {
+                        // cout << "extreme detected" << endl;
+                        for(long k = 0; k < 3; k++) {
+                            detail[k] = scan_1 + (k - 1) * prec_sc;
+                        }
+                    } else {
+                        // cout << "boundary start" << endl;
+                        for(long k = 0; k < 3; k++) {
+                            detail[k] = scan_1 + prec_sc * k;
+                        }
+                    }
+                    prec_iter = 0;
+                    while(prec_iter < params.binary_prec) {
+                        prec_ext = chebeval(deg, coeff, detail[0] / chebeval_k) - function_value(detail[0]);
+                        prec_ind = 0;
+                        for(long k = 1; k < 3; k++) {
+                            tmp = chebeval(deg, coeff, detail[k] / chebeval_k) - function_value(detail[k]);
+                            if((inc_1 == 1 && prec_ext < tmp) || (inc_1 == -1 && prec_ext > tmp)) {
+                                prec_ext = tmp;
+                                prec_ind = k;
+                            } else if(inc_1 == 0) {
+                                if((inc_2 == 1 && prec_ext > tmp) || (inc_2 == -1 && prec_ext < tmp)) {
+                                    prec_ext = tmp;
+                                    prec_ind = k;
+                                }
+                            }
+                        }
+                        if(inc_1 == 0 && prec_ind != 0) {
+                            prec_end = false;
+                        }
+                        prec_x = detail[prec_ind];
+                        prec_sc /= 2;
+                        // cout << "prec_ind : " << prec_ind << " prec_x : " << prec_x << endl;
+                        for(long k = 0; k < 3; k++) {
+                            if(inc_1 == 0) {
+                                detail[k] = max(prec_x - prec_sc, scan_1) + prec_sc * k;
+                            } else {
+                                detail[k] = prec_x - prec_sc + prec_sc * k;
+                            }
+                            // detail[k] = (inc_1 == 0) ? max(prec_x - prec_sc, scan_1) + prec_sc * k : prec_x + (k - 1) * prec_sc;
+                        }
+                        prec_iter++;
+                    }
+                    if(inc_2 == 1) {
+                        tmpinc = -1;
+                    } else {
+                        tmpinc = 1;
+                    }
+                    // tmpinc = (inc_2 == 1) ? -1 : 1;
+                    
+                    // cout << "###" << inc_2 << " " << prec_ext << " " << tmpinc * prec_ext << endl;
+                    if(tmpinc * prec_ext >= current_err) {
+                        local_extreme_point[local_extreme_count].x = prec_x;
+                        local_extreme_point[local_extreme_count].y = prec_ext;
+                        if(inc_2 == 1) {
+                            local_extreme_point[local_extreme_count].locmm = -1;
+                        } else {
+                            local_extreme_point[local_extreme_count].locmm = +1;
+                        }
+                        // local_extreme_point[local_extreme_count++].locmm = (inc_2 == 1) ? -1 : 1;
+
+                        // cout << extreme_point[local_extreme_count].x << " " << extreme_point[local_extreme_count].y << " " << extreme_point[local_extreme_count].locmm << endl;
+                        local_extreme_count++;
+                        // cout << "prec_end : " << prec_end << endl;
+                        // cout << "[" << section_ind << "]: " << local_extreme_count << endl;
+                    }
+                    if(!prec_end) { 
+                        inc_2 = (-1) * inc_2; 
+                        // cout << "inc : " << inc_2 << endl;
+                    }
+                    // inc_2 *= prec_end ? 1 : -1;
+                }
+                inc_2 = tmp_inc;
+            }
+        }
 
         //밑에 조건문은 극값이 이전 step과 경계값 사이에 있을 경우에 극값을 찾기 위해 구현한 코드임. 이는 더 큰 sc, 즉 더 구간을 더 자세히 찾는 것으로 대체하여 주석처리함.
 		// if(fracpart(scan_2) > width[section_ind] + sc[section_ind] / 2) { ///////////
@@ -568,6 +629,8 @@ void RemezGeneral::getextreme() {
 
     vector<thread> vec_thr;
 
+    cout << "getextreme has started" << endl;
+
     for (long i = 0; i < section_num; i++) {
         vec_thr.emplace_back(&RemezGeneral::getextreme_local, this, local_extreme_point_array[i],
         ref(local_extreme_count_array[i]), i);
@@ -578,7 +641,7 @@ void RemezGeneral::getextreme() {
         t.join();
     }
 
-    // cout << "getextreme_local has ended" << endl;
+    cout << "getextreme_local has ended" << endl;
 
     extreme_count = 0;
     for (long i = 0; i < section_num; i++) {
@@ -589,6 +652,10 @@ void RemezGeneral::getextreme() {
 
             extreme_count++;
         }
+    }
+
+    for(long l : local_extreme_count_array) {
+        cout << l << " ";
     }
 
     // cout << "ok" << endl;
@@ -613,12 +680,12 @@ void RemezGeneral::getextreme() {
 
 void RemezGeneral::choosemaxs() {
     RR::SetPrecision(params.RR_prec);
-    Point *extract = new Point[extreme_count];
+    Point extract[extreme_count];
     long count = 0, ind = 0;
     max_err = RR(0);
     min_err = RR(1000);
 
-    long *temparray = new long[extreme_count];
+    long temparray[extreme_count];
     long maxtemp, tempcount = 0;
     RR maxtempvalue;
 
@@ -662,7 +729,6 @@ void RemezGeneral::choosemaxs() {
     count++;
     tempcount = 0;
 
-    cout << "cnt: " << count << endl;
     // cout << count << " " << deg + 2 << endl;
     RR minsum;
     long minindex;
@@ -729,7 +795,7 @@ void RemezGeneral::choosemaxs() {
     }
     
     for (long i = 0; i < (deg + 2); i++) {
-        cout << i << " ";
+        // cout << i << " ";
         sample_point[i].x = extract[i].x;
         sample_point[i].y = function_value(sample_point[i].x);
         // // cout << extract[i].y << endl;
@@ -741,11 +807,12 @@ void RemezGeneral::choosemaxs() {
         //     min_err = abs(extract[i].y);
         // }
         max_err = (max_err < abs(extract[i].y)) ? abs(extract[i].y) : max_err;
-        min_err = (min_err > abs(extract[i].y)) ? min_err : abs(extract[i].y);
+        min_err = (min_err > abs(extract[i].y)) ? abs(extract[i].y) : min_err;
     }
+    cout << endl;
 
-    delete[] extract;
-    delete[] temparray;
+    // delete[] extract;
+    // delete[] temparray;
 }
 
 void RemezGeneral::generate_optimal_poly(Polynomial &poly) {
@@ -753,34 +820,34 @@ void RemezGeneral::generate_optimal_poly(Polynomial &poly) {
     // better_initialize();
     initialize();
 
-    getcoeffwitherr();
-    getextreme();
+    // getcoeffwitherr();
+    // getextreme();
     // choosemaxs();
 
-    // long it = 0;
-    // while ((max_err - min_err) / min_err > approx) {
-    //     getcoeffwitherr();
-    //     getextreme();
-    //     choosemaxs();
-    //     it++;
-    //     // for(long i = 0; i < deg + 2; i++) {
-    //     //         cout << sample_point[i].x << endl;
-    //     // }
-    //     cout << it << "th end" << endl;
-    //     cout << max_err << " " << min_err << endl;
-    // }
-
-    // // for(long i = 0; i < extreme_count; i++) {
-    // //         cout << extreme_point[i].x << " " << extreme_point[i].y << " " << extreme_point[i].locmm << endl;
-    // // }
-    // // cout << endl;
-    
-    // poly.set_polynomial(deg, coeff, "cheb");
-    // //	showgraph(out, coeff, deg, K, sc);
-}
-
-void RemezGeneral::showcoeff() {
-    for (int i = 0; i < deg + 1; i++) {
-        cout << i << " : " << coeff[i] << endl;
+    long it = 0;
+    while ((max_err - min_err) / min_err > approx) {
+        getcoeffwitherr();
+        getextreme();
+        choosemaxs();
+        it++;
+        // for(long i = 0; i < deg + 2; i++) {
+        //         cout << sample_point[i].x << endl;
+        // }
+        cout << it << "th end" << endl;
+        cout << max_err << " " << min_err << endl;
     }
+
+    // for(long i = 0; i < extreme_count; i++) {
+    //         cout << extreme_point[i].x << " " << extreme_point[i].y << " " << extreme_point[i].locmm << endl;
+    // }
+    // cout << endl;
+    
+    poly.set_polynomial(deg, coeff, "cheb");
+    //	showgraph(out, coeff, deg, K, sc);
 }
+
+// void RemezGeneral::showcoeff() {
+//     for (int i = 0; i < deg + 1; i++) {
+//         cout << i << " : " << coeff[i] << endl;
+//     }
+// }

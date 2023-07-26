@@ -66,11 +66,22 @@ void Polynomial::set_zero_polynomial(long _deg) {
 	chebcoeff = new RR[deg + 1]{};
 }
 
+// void Polynomial::showcoeff() {
+// 	for(int i = 0; i < deg + 1; i++) {
+// 		cout << "term " << i << " : " << coeff[i] << endl;
+// 	}
+// 	cout << endl;
+// }
 void Polynomial::showcoeff() {
-	for(int i = 0; i < deg + 1; i++) {
-		cout << "term " << i << " : " << coeff[i] << endl;
-	}
-	cout << endl;
+    for (int i = 0; i < deg; i++) {
+        // cout << i << " : " << coeff[i] << endl;
+        cout << coeff[i];
+        cout << "x^" << i;
+		if(coeff[i + 1] > 0) {
+			cout << " + ";
+		}
+    }
+    cout << coeff[deg] << "x^" << deg << " " << endl;
 }
 
 void Polynomial::showchebcoeff() {
