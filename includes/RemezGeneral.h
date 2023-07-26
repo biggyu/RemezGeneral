@@ -29,6 +29,7 @@ public:
     double chebeval_k;
     long deg;
 
+    RemezGeneral() {}
     RemezGeneral(RemezParam _params, long _section_num, double* _sections, long _deg);
 
     virtual RR function_value(RR x) = 0;
@@ -40,5 +41,5 @@ public:
     void choosemaxs();
 
     void generate_optimal_poly(Polynomial &poly);
-    void showcoeff();
+    // void showcoeff();
 };
