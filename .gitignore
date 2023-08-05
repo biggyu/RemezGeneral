@@ -4,7 +4,8 @@ backup
 *.o
 a.out
 resultfile
-result.txt
+results.csv
+results.txt
 tags
 core
 compile_commands.json
