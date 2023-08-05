@@ -41,6 +41,25 @@ Polynomial::~Polynomial() {
 	}
 }
 
+void Polynomial::set_polynomial(long _deg, RR* _coeff, string tag, double chebval_k) {
+	deg = _deg;
+	coeff = new RR[deg + 1];
+	chebcoeff = new RR[deg + 1];
+	if (tag == "power") {
+		for(int i = 0; i < deg + 1; i++) {
+			coeff[i] = _coeff[i];
+		}
+		power_to_cheb();
+	}
+
+	else if (tag == "cheb") {
+		for(int i = 0; i < deg + 1; i++) {
+			chebcoeff[i] = _coeff[i];
+		}
+		cheb_to_power(chebval_k);
+	}
+}
+
 void Polynomial::set_polynomial(long _deg, RR* _coeff, string tag) {
 	deg = _deg;
 	coeff = new RR[deg + 1];
@@ -75,13 +94,13 @@ void Polynomial::set_zero_polynomial(long _deg) {
 void Polynomial::showcoeff() {
     for (int i = 0; i < deg; i++) {
         // cout << i << " : " << coeff[i] << endl;
-        cout << coeff[i];
-        cout << "x^" << i;
+		cout << coeff[i] << " x^" << i;
 		if(coeff[i + 1] > 0) {
-			cout << " + ";
+			cout << "+ ";
 		}
     }
-    cout << coeff[deg] << "x^" << deg << " " << endl;
+	// cout << coeff[deg] << endl;
+    cout << coeff[deg] << " x^" << deg << " " << endl;
 }
 
 void Polynomial::showchebcoeff() {
@@ -128,6 +147,20 @@ void Polynomial::cheb_to_power() {
 
 	for(int i = 0; i <= deg; i++) {
 		coeff[i] = tmp.coeff[i];
+	}
+}
+void Polynomial::cheb_to_power(double chebeval_k) {
+	Polynomial chebbasis, tmp(deg);
+	for(int i = 0; i <= deg; i++) {
+		chebyshev(chebbasis, i);
+		for(int j = 0; j <= i; j++) {
+			chebbasis.coeff[j] *= chebcoeff[i];
+		}
+		tmp.addinplace(chebbasis);
+	}
+
+	for(int i = 0; i <= deg; i++) {
+		coeff[i] = tmp.coeff[i] / pow(chebeval_k, i);
 	}
 }
 
@@ -731,4 +764,3 @@ void second_chebyshev_times_x_for_sine(Polynomial &rtn, long deg) {
 		rtn.mulinplace(iden);
 	} 
 }
-

@@ -25,6 +25,7 @@ public:
 	Polynomial(long _deg, RR* _coeff, string tag);
 
 	~Polynomial();
+	void set_polynomial(long _deg, RR* _coeff, string tag, double chebval_k);
 	void set_polynomial(long _deg, RR* _coeff, string tag);
 	void set_zero_polynomial(long _deg);
 	void showcoeff();
@@ -32,6 +33,7 @@ public:
 	void copy(Polynomial &poly);
 	void power_to_cheb();
 	void cheb_to_power();
+	void cheb_to_power(double chebeval_k);
 	RR evaluate(RR value);
 
 	void constmul(RR constant);
