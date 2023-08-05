@@ -1,4 +1,5 @@
 #pragma once
+
 #include"func.h"
 #include"Point.h"
 #include"Polynomial.h"
@@ -41,5 +42,8 @@ public:
     void choosemaxs();
 
     void generate_optimal_poly(Polynomial &poly);
+    RR getMax_err();
+    RR* getCoeff();
+    void extreme_countLOW();
     // void showcoeff();
 };
