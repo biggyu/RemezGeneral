@@ -43,7 +43,4 @@ public:
 
     void generate_optimal_poly(Polynomial &poly);
     RR getMax_err();
-    RR* getCoeff();
-    void extreme_countLOW();
-    // void showcoeff();
 };

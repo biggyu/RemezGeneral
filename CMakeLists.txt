@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(REMEZ_REBOOT)
+project(REMEZ_GENERAL)
 
 add_definitions("-g -Wall -march=native -lntl -lgmp -lm")
 add_executable(a.out main.cpp Point.cpp func.cpp Polynomial.cpp RemezGeneral.cpp)

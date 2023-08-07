@@ -494,10 +494,6 @@ void RemezGeneral::getextreme() {
     sort(extreme_point, extreme_point + extreme_count, xcompare);
     cout << "**" << extreme_count << endl;
 
-    if(extreme_count < deg + 2) {
-        extreme_countLOW();
-    }
-
     for (long i = 0; i < section_num; i++) {
         delete[] local_extreme_point_array[i];
     }
@@ -683,13 +679,4 @@ void RemezGeneral::generate_optimal_poly(Polynomial &poly) {
 // }
 RR RemezGeneral::getMax_err() {
     return max_err;
-}
-RR* RemezGeneral::getCoeff() {
-    return coeff;
-}
-void RemezGeneral::extreme_countLOW() {
-    cout << "EXTREME POINTS ARE LOWER THAN DEG + 2!!!!!" << endl;
-    for (long i = 0; i < extreme_count; i++) {
-        cout << i << " " << sample_point[i].x << endl;
-    }
 }

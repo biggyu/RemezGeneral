@@ -25,9 +25,10 @@ public:
 	Polynomial(long _deg, RR* _coeff, string tag);
 
 	~Polynomial();
-	void set_polynomial(long _deg, RR* _coeff, string tag, double chebval_k);
+	void set_polynomial(long _deg, RR* _coeff, string tag, double chebeval_k);
 	void set_polynomial(long _deg, RR* _coeff, string tag);
 	void set_zero_polynomial(long _deg);
+	RR* getcoeff();
 	void showcoeff();
 	void showchebcoeff();
 	void copy(Polynomial &poly);

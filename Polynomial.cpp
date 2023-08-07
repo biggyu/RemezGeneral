@@ -41,7 +41,7 @@ Polynomial::~Polynomial() {
 	}
 }
 
-void Polynomial::set_polynomial(long _deg, RR* _coeff, string tag, double chebval_k) {
+void Polynomial::set_polynomial(long _deg, RR* _coeff, string tag, double chebeval_k) {
 	deg = _deg;
 	coeff = new RR[deg + 1];
 	chebcoeff = new RR[deg + 1];
@@ -56,7 +56,7 @@ void Polynomial::set_polynomial(long _deg, RR* _coeff, string tag, double chebva
 		for(int i = 0; i < deg + 1; i++) {
 			chebcoeff[i] = _coeff[i];
 		}
-		cheb_to_power(chebval_k);
+		cheb_to_power(chebeval_k);
 	}
 }
 
@@ -91,16 +91,19 @@ void Polynomial::set_zero_polynomial(long _deg) {
 // 	}
 // 	cout << endl;
 // }
+RR* Polynomial::getcoeff() {
+	return coeff;
+}
 void Polynomial::showcoeff() {
     for (int i = 0; i < deg; i++) {
         // cout << i << " : " << coeff[i] << endl;
 		cout << coeff[i] << " x^" << i;
 		if(coeff[i + 1] > 0) {
-			cout << "+ ";
+			cout << "+";
 		}
     }
 	// cout << coeff[deg] << endl;
-    cout << coeff[deg] << " x^" << deg << " " << endl;
+    cout << coeff[deg] << " x^" << deg << endl;
 }
 
 void Polynomial::showchebcoeff() {
